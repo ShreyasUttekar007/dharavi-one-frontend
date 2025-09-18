@@ -1,0 +1,87 @@
+.head {
+  background-color: #112D4E;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-img {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.imggg {
+  width: 100px;
+  height: 100px;
+  padding: 20px 10px;
+}
+.footer {
+  text-align: center;
+  margin-top: 100px;
+  margin-bottom: 20px;
+}
+
+.logout-main {
+  color: rgb(255, 255, 255);
+  padding-left: 35px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.logout-main:hover {
+  color: rgb(243, 94, 94);
+  padding-left: 35px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+.mom {
+  width: fit-content;
+  height: fit-content;
+  border: none;
+}
+.logout {
+  width: fit-content;
+  height: fit-content;
+  margin: 0px 15px;
+  border: none;
+  background-color: rgb(255, 0, 0);
+}
+.logout:hover {
+  width: fit-content;
+  height: fit-content;
+  margin: 0px 15px;
+  border: none;
+  background-color: rgb(212, 3, 3);
+}
+.headerssss {
+  color: white;
+  font-size: 50px;
+}
+.headerssss2 {
+  color: white;
+  font-size: 50px;
+}
+.admin-button {
+  border: none;
+  width: fit-content;
+}
+
+@media only screen and (max-width: 700px) {
+  .headerssss2 {
+    font-size: 24px;
+  }
+}
+
+@media only screen and (max-width: 560px) {
+  .headerssss2 {
+    font-size: 16px;
+  }
+}
+
+@media only screen and (max-width: 560px) {
+  .headerssss2 {
+    font-size: 16px;
+  }
+}

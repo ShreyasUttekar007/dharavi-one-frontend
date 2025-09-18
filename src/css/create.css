@@ -1,0 +1,134 @@
+.data-container {
+  max-width: fit-content;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #dfdcdc;
+}
+.data-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.input, select, textarea {
+  width: 275px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.mom-table td,
+.mom-table th {
+  text-align: center;
+}
+.main-ac-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-group {
+  flex-wrap: wrap; /* Equal width for all fields in the row */
+  display: flex;
+  flex-direction: column;
+}
+
+.fields-div {
+  display: flex;
+}
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 10px;
+}
+.export-button {
+  display: flex;
+  justify-content: flex-end;
+  
+}
+input {
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 275px;
+}
+input::placeholder {
+  color: black;
+}
+.display-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.display-data2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 275px;
+}
+.input-fields {
+  margin-bottom: 10px;
+}
+.input-fields2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+.input-fields2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  width: 500px;
+}
+
+button {
+  padding: 15px 20px;
+  background-color: #007bff;
+  color: #fff;
+  width: fit-content;
+  border: none;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+@media only screen and (max-width: 600px) {
+  .input-fields2 {
+    margin-bottom: 10px;
+    width: 300px;
+  }
+  /* .display-data {
+        overflow-x: auto;
+      }
+      .display-table-data {
+        margin-left: 100px;
+      } */
+  .main-ac-container {
+    flex-direction: column;
+  }
+  .data-table-intervention {
+    font-size: 16px;
+  }
+}
