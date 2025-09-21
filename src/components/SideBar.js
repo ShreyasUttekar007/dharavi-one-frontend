@@ -8,195 +8,122 @@ import {
   faSignOutAlt,
   faUserPlus,
   faUsersLine,
+  faFolder,
   faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import logo from "../logo_image.png";
+import { useSidebar } from "../context/SidebarContext";
 
 const SideBar = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { sidebarOpen, close, open, toggle } = useSidebar(); // <— same state
   const [showFormModal, setShowFormModal] = useState(false);
-  const navigate = useNavigate();
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
-  const [role2, setRole2] = useState("");
-
-  const openSidebar = () => {
-    setSidebarOpen(true);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
+  const [userName, setUserName] = useState("");
+  const navigate = useNavigate();
 
   const logout = async () => {
-    await localforage.removeItem("token");
-    await localforage.removeItem("ID");
-    await localforage.removeItem("email");
+    await Promise.all([
+      localforage.removeItem("token"),
+      localforage.removeItem("ID"),
+      localforage.removeItem("email"),
+      localforage.removeItem("userName"),
+      localforage.removeItem("role"),
+      localforage.removeItem("role1"),
+      localforage.removeItem("roles"),
+      localforage.removeItem("location"),
+      localforage.removeItem("stcCode"),
+    ]);
     navigate("/");
+    close();
   };
 
   useEffect(() => {
-    const fetchUserRole = async () => {
+    (async () => {
       try {
-        const storedRole = await localforage.getItem("role1");
-        if (storedRole) {
-          setRole(storedRole);
-        } else {
-          console.log("Role not found in localforage.");
-        }
-      } catch (error) {
-        console.error("Error fetching role:", error);
+        const [r1, mail, name] = await Promise.all([
+          localforage.getItem("role1"),
+          localforage.getItem("email"),
+          localforage.getItem("userName"),
+        ]);
+        if (r1) setRole(r1);
+        if (mail) setEmail(mail);
+        if (name) setUserName(name);
+      } catch (e) {
+        console.error("Error fetching user context:", e);
       }
-    };
-
-    fetchUserRole();
+    })();
   }, []);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const storedRole = await localforage.getItem("role");
-        if (storedRole) {
-          setRole2(storedRole);
-        } else {
-          console.log("Role not found in localforage.");
-        }
-      } catch (error) {
-        console.error("Error fetching role:", error);
-      }
-    };
-
-    fetchUserRole();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const storedEmail = await localforage.getItem("email");
-        if (storedEmail) {
-          setEmail(storedEmail);
-        } else {
-          console.log("Email not found in localforage.");
-        }
-      } catch (error) {
-        console.error("Error fetching email:", error);
-      }
-    };
-    fetchUserEmail();
-  }, []);
-
-  const handleFormNavigation = (path) => {
-    setShowFormModal(false);
-    navigate(path);
-  };
 
   return (
-    <div>
+    <>
       <div
-        className={`w3-sidebar w3-bar-block w3-card w3-animate-left ${
-          sidebarOpen ? "open" : ""
-        }`}
+        className={`nb-overlay ${sidebarOpen ? "show" : ""}`}
+        onClick={close}
+      />
+
+      <aside
+        className={`nb-sidebar ${sidebarOpen ? "open" : ""}`}
+        aria-hidden={!sidebarOpen}
       >
-        <div className="close-div">
-          <button className="sidebar-close-button" onClick={closeSidebar}>
-            Close &times;
-          </button>
-          <a href="/welcome" className="w3-bar-item w3-button">
-            <div className="main-text-box">
-              <FontAwesomeIcon icon={faHouse} className="font-pdf2" size="1x" />
-              Home
+        <div className="nb-sidebar-head">
+          <div className="nb-brand">
+            <img src={logo} alt="Logo" />
+            <div className="nb-brand-name">
+              <span>Dharavi One</span>
+              {userName ? <small>{userName}</small> : null}
             </div>
-          </a>
-          {role !== "mod" || role === "ops" ? null : (
-            <a href="/userdashboard" className="w3-bar-item w3-button">
-              <div className="main-text-box">
-                <FontAwesomeIcon
-                  icon={faUsersLine}
-                  className="font-pdf2"
-                  size="1x"
-                />
-                User Data
-              </div>
-            </a>
-          )}
-
-          {role !== "mod" && role !== "hr" ? null : (
-            <a
-              href="/nWuRGm1GvLXyCmQ6TbxqfQ7YasvDlY8z87TxUHrX0HUhX0Pxa9"
-              className="w3-bar-item w3-button"
-            >
-              <div className="main-text-box">
-                <FontAwesomeIcon
-                  icon={faUserPlus}
-                  className="font-pdf2"
-                  size="1x"
-                />
-                Add User
-              </div>
-            </a>
-          )}
-
-          <a
-            href="#"
-            className="w3-bar-item w3-button"
-            onClick={(e) => {
-              e.preventDefault(); // prevents navigation
-              setShowFormModal(true);
-            }}
-          >
-            <div className="main-text-box">
-              <FontAwesomeIcon
-                icon={faFileAlt}
-                className="font-pdf2"
-                size="1x"
-              />
-              Choose Report Type
-            </div>
-          </a>
-
-          <a href="/" className="w3-bar-item w3-button" onClick={logout}>
-            <div className="main-text-box">
-              <FontAwesomeIcon
-                icon={faSignOutAlt}
-                className="font-pdf2"
-                size="1x"
-              />
-              Logout
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div id="main">
-        <button id="openNav" className="sidebar-button" onClick={openSidebar}>
-          &#9776;
-        </button>
-      </div>
-
-      {showFormModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Select a Report Type</h3>
-            <ul className="form-options">
-              <li onClick={() => handleFormNavigation("/area-form")}>
-                📍 Area
-              </li>
-              <li onClick={() => handleFormNavigation("/profile-form")}>
-                👤 Person Profile
-              </li>
-              <li onClick={() => handleFormNavigation("/daily-dossier-form")}>
-                📝 Daily Dossier
-              </li>
-            </ul>
-            <button
-              className="close-btn"
-              onClick={() => setShowFormModal(false)}
-            >
-              Cancel
-            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        <nav className="nb-nav">
+          <a href="/welcome" className="nb-item" onClick={close}>
+            <FontAwesomeIcon icon={faHouse} />
+            <span>Home</span>
+          </a>
+
+          {(role === "mod" || role === "hr") && (
+            <a href="/userdashboard" className="nb-item" onClick={close}>
+              <FontAwesomeIcon icon={faUsersLine} />
+              <span>User Data</span>
+            </a>
+          )}
+
+          <a href="/deity-structures" className="nb-item" onClick={close}>
+            <FontAwesomeIcon icon={faFolder} />
+            <span>Religious Structures</span>
+          </a>
+
+          <a href="/schools" className="nb-item" onClick={close}>
+            <FontAwesomeIcon icon={faFolder} />
+            <span>School Structures</span>
+          </a>
+
+          <a href="/structure-data" className="nb-item" onClick={close}>
+            <FontAwesomeIcon icon={faFolder} />
+            <span>Structure Data</span>
+          </a>
+
+          {(role === "mod" || role === "hr") && (
+            <a
+              href="/nWuRGm1GvLXyCmQ6TbxqfQ7YasvDlY8z87TxUHrX0HUhX0Pxa9"
+              className="nb-item"
+              onClick={close}
+            >
+              <FontAwesomeIcon icon={faUserPlus} />
+              <span>Add User</span>
+            </a>
+          )}
+        </nav>
+
+        <div className="nb-footer">
+          <button className="nb-logout" onClick={logout}>
+            <FontAwesomeIcon icon={faSignOutAlt} />
+            Logout
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 

@@ -1,0 +1,117 @@
+/* Panel container */
+.llm-panel {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: fit-content;
+  padding: 12px;
+  border-left: 1px solid var(--nb-gray-200, #e6e9ef);
+  background: #fafbff;
+  max-height: 100vh;
+}
+
+/* Title */
+.llm-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--nb-blue, #0072bc);
+  margin-bottom: 6px;
+}
+
+/* Input */
+.llm-input {
+  border-radius: 10px;
+  border: 1px solid var(--nb-gray-300, #d1d5db);
+  font-size: 14px;
+  line-height: 1.4;
+  resize: none;
+  min-height: 90px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.llm-input:focus {
+  border-color: var(--nb-purple, #8e2de2);
+  box-shadow: 0 0 0 2px rgba(142, 45, 226, 0.25);
+}
+
+/* Button */
+.llm-btn {
+  align-self: flex-end;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--nb-blue, #0072bc),
+    var(--nb-purple, #8e2de2)
+  );
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.llm-btn:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(90deg, #005fa3, #7320c2);
+}
+
+/* Chat area */
+.llm-response {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.llm-bubble {
+  max-width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  line-height: 1.6;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.llm-bubble.assistant {
+  background: #f3f0ff;
+  border: 1px solid #e0d7ff;
+  color: #1f2937;
+  align-self: flex-start;
+}
+.llm-bubble.user {
+  background: #0072bc;
+  color: #fff;
+  align-self: flex-end;
+}
+
+/* Responsive for panel */
+@media (max-width: 1200px) {
+  .llm-panel {
+    flex: none;
+    max-height: none;
+    border-left: 0;
+    border-top: 1px solid var(--nb-gray-200, #e6e9ef);
+    background: #fff;
+  }
+}
+@media (max-width: 768px) {
+  .llm-title {
+    font-size: 16px;
+  }
+  .llm-input {
+    font-size: 13px;
+    min-height: 80px;
+  }
+  .llm-btn {
+    padding: 8px 16px;
+  }
+}
+@media (max-width: 420px) {
+  .llm-input {
+    font-size: 12px;
+  }
+  .llm-btn {
+    width: 100%;
+    align-self: stretch;
+  }
+}

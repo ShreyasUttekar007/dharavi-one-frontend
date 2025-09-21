@@ -3,6 +3,10 @@ import localforage from "localforage";
 import "../css/welcomepage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faUsersLine } from "@fortawesome/free-solid-svg-icons";
+import StructureSnapshots from "./StructureSnapshots";
+
+const BANNER_URL =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"; // placeholder
 
 const WelcomePage = () => {
   const [userName, setUserName] = useState("");
@@ -15,27 +19,69 @@ const WelcomePage = () => {
 
   return (
     <>
-      <div className="welcome-container">
-        <h1>👋 Welcome, {userName}!</h1>
-        <div className="buttons-container">
-          <h2 className="head-text-welcome">Dashboards</h2>
-          <div className="buttons">
-            {role !== "mod" && role !== "hr" ? null : (
-              <a href="/userdashboard" className="menu-buttons">
-                <FontAwesomeIcon
-                  icon={faUsersLine}
-                  className="font-pdf"
-                  size="3x"
-                />
-                User Data
+      <section className="welcome-banner">
+        <img src={BANNER_URL} alt="Dharavi One banner" loading="lazy" />
+      </section>
+      <div className="welcome-wrap">
+        <header className="welcome-hero">
+          <h1 className="welcome-title">
+            <span className="wave">👋</span> Welcome,{" "}
+            <span className="grad">{userName || "Guest"}</span>
+          </h1>
+        </header>
+
+        <section className="dashboards">
+          <h2 className="section-title">Dashboards</h2>
+
+          <div className="card-grid">
+            {(role === "mod" || role === "hr") && (
+              <a href="/userdashboard" className="dash-card">
+                <div className="card-icon">
+                  <FontAwesomeIcon icon={faUsersLine} />
+                </div>
+                <div className="card-body">
+                  <h3>User Data</h3>
+                  <p>Manage users, roles and access</p>
+                </div>
+                <span className="card-arrow">→</span>
               </a>
             )}
-            <a href="/deity-structures" className="menu-buttons">
-              <FontAwesomeIcon icon={faFolder} className="font-pdf" size="3x" />
-              Deity-structures
+
+            <a href="/deity-structures" className="dash-card">
+              <div className="card-icon">
+                <FontAwesomeIcon icon={faFolder} />
+              </div>
+              <div className="card-body">
+                <h3>Religious Structures</h3>
+                <p>Browse, filter and review structures</p>
+              </div>
+              <span className="card-arrow">→</span>
+            </a>
+            <a href="/schools" className="dash-card">
+              <div className="card-icon">
+                <FontAwesomeIcon icon={faFolder} />
+              </div>
+              <div className="card-body">
+                <h3>School Structures</h3>
+                <p>A quick, filtered view of every school at a glance.</p>
+              </div>
+              <span className="card-arrow">→</span>
+            </a>
+
+            <a href="/structure-data" className="dash-card">
+              <div className="card-icon">
+                <FontAwesomeIcon icon={faFolder} />
+              </div>
+              <div className="card-body">
+                <h3>Structure Data</h3>
+                <p>Tabular data view & quick edits</p>
+              </div>
+              <span className="card-arrow">→</span>
             </a>
           </div>
-        </div>
+        </section>
+
+        <StructureSnapshots />
       </div>
     </>
   );

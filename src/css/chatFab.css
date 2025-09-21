@@ -1,0 +1,28 @@
+:root{
+  --nb-blue:#0072bc;
+  --nb-purple:#8e2de2;
+}
+
+.nb-chat-fab{
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, var(--nb-blue), var(--nb-purple));
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 110;                /* above content, below modals */
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  transition: transform .12s, box-shadow .18s, opacity .18s;
+}
+.nb-chat-fab:hover{ transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,0,0,.22); }
+.nb-chat-fab:active{ transform: translateY(0); }
+@media (max-width: 520px){
+  .nb-chat-fab{ right: 12px; bottom: 12px; width: 52px; height: 52px; }
+}

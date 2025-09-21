@@ -7,57 +7,56 @@ import "../css/deityStructure.css";
 const PLACEHOLDER_IMG =
   "https://placehold.co/520x300?text=No+Image&font=roboto";
 
-const STATUS_OPTIONS = ["Relevance", "Relocate", "Consolidate"];
-const RELEVANCE_OPTIONS = ["Low", "Moderate", "High", "Critical"];
-
-// keep slider height in one place (CSS also uses 280px)
-const SLIDE_H = 280;
+const STATUS_OPTIONS = ["Regularize", "Relocate", "Consolidate"];
+const RELEVANCE_OPTIONS = ["Low", "Moderate", "High"];
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 const DeityStructure = () => {
-  const [role, setRole] = useState("viewer"); // viewer | mod
+  const [role, setRole] = useState("viewer");
   const [structures, setStructures] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState({}); // per-card index
+  const [currentIndex, setCurrentIndex] = useState({});
 
-  // dropdown filters (auto-filled from data)
-  const [pick, setPick] = useState({
+  // filters
+  const initialPick = {
     primaryKey: "All",
     sector: "All",
     ward: "All",
     relevance: "All",
     deity: "All",
-  });
-
-  // slider filters (minimum thresholds)
+  };
+  const [pick, setPick] = useState(initialPick);
   const [minFootfall, setMinFootfall] = useState(0);
   const [minArea, setMinArea] = useState(0);
 
-  // role from localforage
+  // collapsible filters (to avoid blocking content on small screens)
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  useEffect(() => {
+    const setByWidth = () => setFiltersOpen(window.innerWidth >= 900);
+    setByWidth();
+    window.addEventListener("resize", setByWidth);
+    return () => window.removeEventListener("resize", setByWidth);
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
         const r = await localforage.getItem("role");
         if (typeof r === "string") setRole(r);
-      } catch {
-        /* viewer by default */
-      }
+      } catch {}
     })();
   }, []);
 
-  // fetch
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/structures/get-structure`
-        );
+        const res = await axios.get(`${API_URL}/structures/get-structure`);
         const data = res.data || [];
         setStructures(data);
         setFiltered(data);
 
-        // initialize per-card slide index
+        // init slide index per card
         const initIdx = {};
         data.forEach((s) => (initIdx[s._id || s.primaryKey] = 0));
         setCurrentIndex(initIdx);
@@ -67,7 +66,6 @@ const DeityStructure = () => {
     })();
   }, []);
 
-  // helpers
   const toNum = (v) => {
     if (v == null) return 0;
     const n = String(v)
@@ -76,7 +74,6 @@ const DeityStructure = () => {
     return n ? parseFloat(n[0]) : 0;
   };
 
-  // derive dropdown options & slider max from data
   const { keys, sectors, wards, relevances, deities, maxFootfall, maxArea } =
     useMemo(() => {
       const uniq = (arr) =>
@@ -95,6 +92,7 @@ const DeityStructure = () => {
         ...structures.map((s) => toNum(s.footfall))
       );
       const maxArea = Math.max(0, ...structures.map((s) => toNum(s.areaSqFt)));
+
       return {
         keys,
         sectors,
@@ -106,13 +104,11 @@ const DeityStructure = () => {
       };
     }, [structures]);
 
-  // initialize sliders when data arrives
   useEffect(() => {
     setMinFootfall(0);
     setMinArea(0);
   }, [maxFootfall, maxArea]);
 
-  // filtering
   useEffect(() => {
     const result = structures.filter((s) => {
       if (pick.primaryKey !== "All" && s.primaryKey !== pick.primaryKey)
@@ -145,18 +141,17 @@ const DeityStructure = () => {
     return "status-badge neutral";
   };
 
-  // update API (status/relevance)
   const handleUpdate = async (id, field, value) => {
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/structures/update-structure/${id}`,
+        `${API_URL}/structures/update-structure/${id}`,
         { [field]: value }
       );
-      setStructures((prev) =>
-        prev.map((s) => (s._id === id ? { ...s, [field]: data[field] } : s))
+      setStructures((p) =>
+        p.map((s) => (s._id === id ? { ...s, [field]: data[field] } : s))
       );
-      setFiltered((prev) =>
-        prev.map((s) => (s._id === id ? { ...s, [field]: data[field] } : s))
+      setFiltered((p) =>
+        p.map((s) => (s._id === id ? { ...s, [field]: data[field] } : s))
       );
     } catch (err) {
       console.error("Update failed:", err);
@@ -164,7 +159,6 @@ const DeityStructure = () => {
     }
   };
 
-  // react-select sizing for filters
   const selectStyles = {
     control: (base) => ({
       ...base,
@@ -179,156 +173,202 @@ const DeityStructure = () => {
     menu: (base) => ({ ...base, zIndex: 5 }),
   };
 
-  // slider helpers
   const goToPhoto = (id, idx) => setCurrentIndex((p) => ({ ...p, [id]: idx }));
-
   const nextPhoto = (id, length) =>
     setCurrentIndex((p) => ({ ...p, [id]: ((p[id] || 0) + 1) % length }));
 
+  const resetFilters = () => {
+    setPick(initialPick);
+    setMinFootfall(0);
+    setMinArea(0);
+  };
+
   return (
-    <div className="page-layout">
-      {/* LEFT: Filters + Card list */}
-      <div className="deity-container">
-        <h1 className="deity-title">Deity Structures</h1>
+    <div className="page-layout no-right">
+      {/* Left = the ONLY scroll container (no extra page scrollbar) */}
+      <div className="left-col">
+        <h1 className="deity-title">Religious Structures</h1>
 
-        {/* Filters */}
-        <div className="filters-wrap">
-          <div className="filter-row">
-            <div className="filter-field">
-              <label>Primary Key</label>
-              <Select
-                value={
-                  pick.primaryKey === "All"
-                    ? null
-                    : { value: pick.primaryKey, label: pick.primaryKey }
-                }
-                onChange={(opt) =>
-                  setPick({ ...pick, primaryKey: opt ? opt.value : "All" })
-                }
-                options={[
-                  { value: "All", label: "All" },
-                  ...keys.map((k) => ({ value: k, label: k })),
-                ]}
-                isSearchable
-                placeholder="Select Primary Key"
-                className="custom-select"
-                styles={selectStyles}
-              />
+        {/* Sticky filter shell with show/hide toggle */}
+        <div className="deity-filters-shell">
+          <button
+            className="deity-filter-toggle"
+            onClick={() => setFiltersOpen((v) => !v)}
+            aria-expanded={filtersOpen}
+          >
+            {filtersOpen ? "Hide Filters" : "Show Filters"}
+          </button>
+
+          <div className={`filters-wrap sticky ${filtersOpen ? "" : "closed"}`}>
+            <div className="filter-row">
+              <div className="filter-field">
+                <label>Primary Key</label>
+                <Select
+                  value={
+                    pick.primaryKey === "All"
+                      ? null
+                      : { value: pick.primaryKey, label: pick.primaryKey }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, primaryKey: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...keys.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Primary Key"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
+
+              <div className="filter-field">
+                <label>Sector</label>
+                <Select
+                  value={
+                    pick.sector === "All"
+                      ? null
+                      : { value: pick.sector, label: pick.sector }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, sector: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...sectors.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Sector"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
+
+              <div className="filter-field">
+                <label>Ward</label>
+                <Select
+                  value={
+                    pick.ward === "All"
+                      ? null
+                      : { value: pick.ward, label: pick.ward }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, ward: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...wards.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Ward"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
+
+              <div className="filter-field">
+                <label>Relevance</label>
+                <Select
+                  value={
+                    pick.relevance === "All"
+                      ? null
+                      : { value: pick.relevance, label: pick.relevance }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, relevance: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...relevances.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Relevance"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
+
+              <div className="filter-field">
+                <label>Deity</label>
+                <Select
+                  value={
+                    pick.deity === "All"
+                      ? null
+                      : { value: pick.deity, label: pick.deity }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, deity: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...deities.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Deity"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
             </div>
 
-            <div className="filter-field">
-              <label>Sector</label>
-              <Select
-                value={
-                  pick.sector === "All"
-                    ? null
-                    : { value: pick.sector, label: pick.sector }
-                }
-                onChange={(opt) =>
-                  setPick({ ...pick, sector: opt ? opt.value : "All" })
-                }
-                options={[
-                  { value: "All", label: "All" },
-                  ...sectors.map((k) => ({ value: k, label: k })),
-                ]}
-                isSearchable
-                placeholder="Select Sector"
-                className="custom-select"
-                styles={selectStyles}
-              />
-            </div>
+            <div className="filter-row sliders">
+              <div className="filter-field slider">
+                <label>Footfall ≥ {minFootfall}</label>
+                <input
+                  type="range"
+                  className="input-range"
+                  min={0}
+                  max={Math.max(100, Math.ceil(maxFootfall))}
+                  value={minFootfall}
+                  onChange={(e) => setMinFootfall(Number(e.target.value))}
+                />
+              </div>
 
-            <div className="filter-field">
-              <label>Ward</label>
-              <Select
-                value={
-                  pick.ward === "All"
-                    ? null
-                    : { value: pick.ward, label: pick.ward }
-                }
-                onChange={(opt) =>
-                  setPick({ ...pick, ward: opt ? opt.value : "All" })
-                }
-                options={[
-                  { value: "All", label: "All" },
-                  ...wards.map((k) => ({ value: k, label: k })),
-                ]}
-                isSearchable
-                placeholder="Select Ward"
-                className="custom-select"
-                styles={selectStyles}
-              />
-            </div>
-
-            <div className="filter-field">
-              <label>Relevance</label>
-              <Select
-                value={
-                  pick.relevance === "All"
-                    ? null
-                    : { value: pick.relevance, label: pick.relevance }
-                }
-                onChange={(opt) =>
-                  setPick({ ...pick, relevance: opt ? opt.value : "All" })
-                }
-                options={[
-                  { value: "All", label: "All" },
-                  ...relevances.map((k) => ({ value: k, label: k })),
-                ]}
-                isSearchable
-                placeholder="Select Relevance"
-                className="custom-select"
-                styles={selectStyles}
-              />
-            </div>
-
-            <div className="filter-field">
-              <label>Deity</label>
-              <Select
-                value={
-                  pick.deity === "All"
-                    ? null
-                    : { value: pick.deity, label: pick.deity }
-                }
-                onChange={(opt) =>
-                  setPick({ ...pick, deity: opt ? opt.value : "All" })
-                }
-                options={[
-                  { value: "All", label: "All" },
-                  ...deities.map((k) => ({ value: k, label: k })),
-                ]}
-                isSearchable
-                placeholder="Select Deity"
-                className="custom-select"
-                styles={selectStyles}
-              />
+              <div className="filter-field slider">
+                <div className="slider-row">
+                  <label>Area (sq.ft) ≥ {minArea}</label>
+                  <button
+                    className="reset-btn"
+                    onClick={resetFilters}
+                    title="Reset all filters"
+                    aria-label="Reset filters"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M3 12a9 9 0 1 0 3-6.708"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M3 4v5h5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <input
+                  type="range"
+                  className="input-range"
+                  min={0}
+                  max={Math.max(100, Math.ceil(maxArea))}
+                  value={minArea}
+                  onChange={(e) => setMinArea(Number(e.target.value))}
+                />
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="filter-row sliders">
-            <div className="filter-field slider">
-              <label>Footfall ≥ {minFootfall}</label>
-              <input
-                type="range"
-                className="input-range"
-                min={0}
-                max={Math.max(100, Math.ceil(maxFootfall))}
-                value={minFootfall}
-                onChange={(e) => setMinFootfall(Number(e.target.value))}
-              />
-            </div>
-            <div className="filter-field slider">
-              <label>Area (sq.ft) ≥ {minArea}</label>
-              <input
-                type="range"
-                className="input-range"
-                min={0}
-                max={Math.max(100, Math.ceil(maxArea))}
-                value={minArea}
-                onChange={(e) => setMinArea(Number(e.target.value))}
-              />
-            </div>
-          </div>
+        {/* Results counter */}
+        <div className="results-bar">
+          Showing <strong>{filtered.length}</strong> of{" "}
+          <strong>{structures.length}</strong> entries
         </div>
 
         {/* Cards */}
@@ -336,17 +376,15 @@ const DeityStructure = () => {
           {filtered.map((item) => {
             const id = item._id || item.primaryKey;
 
-            // Build a clean array of photo URLs (image can be a string or an array)
+            // photo list (supports image: string or array)
             const photosRaw =
               (Array.isArray(item.photos) && item.photos) ||
               (Array.isArray(item.images) && item.images) ||
               (Array.isArray(item.image) && item.image) ||
               (item.image ? [item.image] : []);
-
             const photos = photosRaw.filter((u) => !!String(u || "").trim());
             const count = Math.max(1, photos.length);
             const idx = Math.min(currentIndex[id] || 0, count - 1);
-            const photoSrc = photos[idx] || PLACEHOLDER_IMG;
 
             const gmaps = mapUrl(item.latitude, item.longitude);
 
@@ -356,7 +394,7 @@ const DeityStructure = () => {
                   <div className="pk-badge">{item.primaryKey}</div>
                 ) : null}
 
-                {/* LEFT INFO (unchanged) */}
+                {/* LEFT INFO */}
                 <div className="card-left-info">
                   <div className="title-row">
                     <h2 className="card-title">
@@ -408,10 +446,9 @@ const DeityStructure = () => {
                   )}
                 </div>
 
-                {/* RIGHT: Image + side navigation like your mock */}
+                {/* RIGHT: image + vertical nav */}
                 <div className="card-right-img">
                   <div className="image-slider">
-                    {/* single <img> + translateY on wrapper for reliability */}
                     <div
                       className="image-wrapper"
                       style={{ transform: `translateX(-${idx * 100}%)` }}
@@ -431,7 +468,7 @@ const DeityStructure = () => {
                       )}
                     </div>
 
-                    {/* Relevance (top-left) */}
+                    {/* Relevance & Status overlays */}
                     {role === "mod" ? (
                       <select
                         className="overlay-select top-left"
@@ -452,7 +489,6 @@ const DeityStructure = () => {
                       </div>
                     )}
 
-                    {/* Status (top-right) */}
                     {role === "mod" ? (
                       <select
                         className="overlay-select top-right"
@@ -477,7 +513,6 @@ const DeityStructure = () => {
                       </div>
                     )}
 
-                    {/* Bottom chips */}
                     <div className="img-chip bottom-left">
                       {item.dateOfEstablishment
                         ? `Est: ${item.dateOfEstablishment}`
@@ -488,7 +523,6 @@ const DeityStructure = () => {
                     </div>
                   </div>
 
-                  {/* Vertical nav beside image: dots + round arrow */}
                   <div className="slider-nav">
                     <div className="nav-dots">
                       {(photos.length ? photos : [PLACEHOLDER_IMG]).map(
@@ -497,7 +531,7 @@ const DeityStructure = () => {
                             key={i}
                             className={`nav-dot ${i === idx ? "active" : ""}`}
                             aria-label={`Photo ${i + 1}`}
-                            onClick={() => goToPhoto(id, i, photos.length || 1)}
+                            onClick={() => goToPhoto(id, i)}
                           />
                         )
                       )}
@@ -517,17 +551,6 @@ const DeityStructure = () => {
             );
           })}
         </div>
-      </div>
-
-      {/* RIGHT: LLM vertical panel */}
-      <div className="llm-panel">
-        <h2 className="llm-title">LLM Assistant</h2>
-        <textarea
-          className="llm-input"
-          placeholder="Ask something about these structures…"
-          rows={5}
-        />
-        <button className="llm-btn">Send</button>
       </div>
     </div>
   );
