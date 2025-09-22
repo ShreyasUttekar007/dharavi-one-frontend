@@ -37,6 +37,9 @@ const feeBucket = (feeNumber) => {
   return "NA";
 };
 
+const hasValue = (v) =>
+  v !== undefined && v !== null && String(v).trim() !== "";
+
 const SchoolStructures = () => {
   const [role, setRole] = useState("viewer");
   const [schools, setSchools] = useState([]);
@@ -415,32 +418,47 @@ const SchoolStructures = () => {
                     <FontAwesomeIcon
                       icon={faSchool}
                       className="school-title-icon"
+                      style={{ marginRight: 8 }}
                     />
                     {s.schoolName || "Unnamed School"}
                   </h2>
 
                   <div className="meta-vertical">
-                    <div>
-                      <strong>Medium:</strong> {s.mediumOfInstruction || "-"}
-                    </div>
-                    <div>
-                      <strong>Grade:</strong> {s.grade || "-"}
-                    </div>
-                    <div>
-                      <strong>Sector:</strong> {s.sector || "-"}
-                    </div>
-                    <div>
-                      <strong>Ward:</strong> {s.ward || "-"}
-                    </div>
-                    <div>
-                      <strong>Average Fees:</strong> {s.averageFees || "-"}
-                    </div>
-                    <div>
-                      <strong>Teachers:</strong> {s.teachers ?? "-"}
-                    </div>
-                    <div>
-                      <strong>Principal:</strong> {s.principal || "-"}
-                    </div>
+                    {hasValue(s.mediumOfInstruction) && (
+                      <div>
+                        <strong>Medium:</strong> {s.mediumOfInstruction}
+                      </div>
+                    )}
+                    {hasValue(s.grade) && (
+                      <div>
+                        <strong>Grade:</strong> {s.grade}
+                      </div>
+                    )}
+                    {hasValue(s.sector) && (
+                      <div>
+                        <strong>Sector:</strong> {s.sector}
+                      </div>
+                    )}
+                    {hasValue(s.ward) && (
+                      <div>
+                        <strong>Ward:</strong> {s.ward}
+                      </div>
+                    )}
+                    {hasValue(s.averageFees) && (
+                      <div>
+                        <strong>Average Fees:</strong> {s.averageFees}
+                      </div>
+                    )}
+                    {hasValue(s.teachers) && (
+                      <div>
+                        <strong>Teachers:</strong> {s.teachers}
+                      </div>
+                    )}
+                    {hasValue(s.principal) && (
+                      <div>
+                        <strong>Principal:</strong> {s.principal}
+                      </div>
+                    )}
                   </div>
 
                   {/* Address box (like remarks in Deity) */}

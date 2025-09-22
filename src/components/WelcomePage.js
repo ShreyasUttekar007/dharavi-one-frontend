@@ -4,9 +4,8 @@ import "../css/welcomepage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faUsersLine } from "@fortawesome/free-solid-svg-icons";
 import StructureSnapshots from "./StructureSnapshots";
+import img from "../Web_Banner.png";
 
-const BANNER_URL =
-  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop"; // placeholder
 
 const WelcomePage = () => {
   const [userName, setUserName] = useState("");
@@ -20,7 +19,7 @@ const WelcomePage = () => {
   return (
     <>
       <section className="welcome-banner">
-        <img src={BANNER_URL} alt="Dharavi One banner" loading="lazy" />
+        <img src={img} alt="Dharavi One banner" loading="lazy" />
       </section>
       <div className="welcome-wrap">
         <header className="welcome-hero">
@@ -68,6 +67,7 @@ const WelcomePage = () => {
               <span className="card-arrow">→</span>
             </a>
 
+            
             <a href="/structure-data" className="dash-card">
               <div className="card-icon">
                 <FontAwesomeIcon icon={faFolder} />
@@ -78,10 +78,20 @@ const WelcomePage = () => {
               </div>
               <span className="card-arrow">→</span>
             </a>
+            <a href="/schools-table" className="dash-card">
+              <div className="card-icon">
+                <FontAwesomeIcon icon={faFolder} />
+              </div>
+              <div className="card-body">
+                <h3>Schools Data</h3>
+                <p>Tabular data view & quick edits</p>
+              </div>
+              <span className="card-arrow">→</span>
+            </a>
           </div>
         </section>
 
-        <StructureSnapshots />
+        {/* <StructureSnapshots /> */}
       </div>
     </>
   );

@@ -16,7 +16,6 @@
 
 /* ===== Page canvas with subtle brand glow ===== */
 .welcome-wrap {
-  min-height: calc(100vh - 0px);
   padding: 28px 22px 40px;
   background: radial-gradient(
       1100px 600px at 90% -10%,
@@ -110,7 +109,7 @@
 /* Slightly taller on very large screens, smaller on phones */
 @media (min-width: 1400px) {
   .welcome-banner img {
-    height: 280px;
+    height: 210px;
   }
 }
 @media (max-width: 520px) {

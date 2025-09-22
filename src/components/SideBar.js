@@ -103,6 +103,10 @@ const SideBar = () => {
             <FontAwesomeIcon icon={faFolder} />
             <span>Structure Data</span>
           </a>
+          <a href="/schools-table" className="nb-item" onClick={close}>
+            <FontAwesomeIcon icon={faFolder} />
+            <span>School Data</span>
+          </a>
 
           {(role === "mod" || role === "hr") && (
             <a

@@ -1,3 +1,4 @@
+// src/components/DeityStructure.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Select from "react-select";
@@ -5,7 +6,7 @@ import localforage from "localforage";
 import "../css/deityStructure.css";
 
 const PLACEHOLDER_IMG =
-  "https://placehold.co/520x300?text=No+Image&font=roboto";
+  "https://placehold.co/1200x800/eeeeee/777777?text=No+Image";
 
 const STATUS_OPTIONS = ["Regularize", "Relocate", "Consolidate"];
 const RELEVANCE_OPTIONS = ["Low", "Moderate", "High"];
@@ -25,12 +26,16 @@ const DeityStructure = () => {
     ward: "All",
     relevance: "All",
     deity: "All",
+    status: "All", // NEW
   };
   const [pick, setPick] = useState(initialPick);
   const [minFootfall, setMinFootfall] = useState(0);
   const [minArea, setMinArea] = useState(0);
 
-  // collapsible filters (to avoid blocking content on small screens)
+  const hasValue = (v) =>
+    v !== undefined && v !== null && String(v).trim() !== "";
+
+  // collapsible filters (avoid blocking content on small screens)
   const [filtersOpen, setFiltersOpen] = useState(true);
   useEffect(() => {
     const setByWidth = () => setFiltersOpen(window.innerWidth >= 900);
@@ -39,15 +44,19 @@ const DeityStructure = () => {
     return () => window.removeEventListener("resize", setByWidth);
   }, []);
 
+  // role
   useEffect(() => {
     (async () => {
       try {
         const r = await localforage.getItem("role");
         if (typeof r === "string") setRole(r);
-      } catch {}
+      } catch {
+        /* noop */
+      }
     })();
   }, []);
 
+  // data
   useEffect(() => {
     (async () => {
       try {
@@ -74,41 +83,54 @@ const DeityStructure = () => {
     return n ? parseFloat(n[0]) : 0;
   };
 
-  const { keys, sectors, wards, relevances, deities, maxFootfall, maxArea } =
-    useMemo(() => {
-      const uniq = (arr) =>
-        Array.from(new Set(arr.filter((x) => x && String(x).trim() !== "")));
+  // derive dropdown options & slider max from data
+  const {
+    keys,
+    sectors,
+    wards,
+    relevances,
+    deities,
+    statuses,
+    maxFootfall,
+    maxArea,
+  } = useMemo(() => {
+    const uniq = (arr) =>
+      Array.from(new Set(arr.filter((x) => x && String(x).trim() !== "")));
 
-      const keys = uniq(structures.map((s) => s.primaryKey)).sort();
-      const sectors = uniq(structures.map((s) => s.sector)).sort();
-      const wards = uniq(structures.map((s) => s.ward)).sort(
-        (a, b) => toNum(a) - toNum(b)
-      );
-      const relevances = uniq(structures.map((s) => s.relevance)).sort();
-      const deities = uniq(structures.map((s) => s.deity)).sort();
+    const keys = uniq(structures.map((s) => s.primaryKey)).sort();
+    const sectors = uniq(structures.map((s) => s.sector)).sort();
+    const wards = uniq(structures.map((s) => s.ward)).sort(
+      (a, b) => toNum(a) - toNum(b)
+    );
+    const relevances = uniq(structures.map((s) => s.relevance)).sort();
+    const deities = uniq(structures.map((s) => s.deity)).sort();
+    const statuses = uniq(structures.map((s) => s.status)).sort();
 
-      const maxFootfall = Math.max(
-        0,
-        ...structures.map((s) => toNum(s.footfall))
-      );
-      const maxArea = Math.max(0, ...structures.map((s) => toNum(s.areaSqFt)));
+    const maxFootfall = Math.max(
+      0,
+      ...structures.map((s) => toNum(s.footfall))
+    );
+    const maxArea = Math.max(0, ...structures.map((s) => toNum(s.areaSqFt)));
 
-      return {
-        keys,
-        sectors,
-        wards,
-        relevances,
-        deities,
-        maxFootfall,
-        maxArea,
-      };
-    }, [structures]);
+    return {
+      keys,
+      sectors,
+      wards,
+      relevances,
+      deities,
+      statuses,
+      maxFootfall,
+      maxArea,
+    };
+  }, [structures]);
 
+  // reset sliders on new data
   useEffect(() => {
     setMinFootfall(0);
     setMinArea(0);
   }, [maxFootfall, maxArea]);
 
+  // filtering
   useEffect(() => {
     const result = structures.filter((s) => {
       if (pick.primaryKey !== "All" && s.primaryKey !== pick.primaryKey)
@@ -118,6 +140,7 @@ const DeityStructure = () => {
       if (pick.relevance !== "All" && s.relevance !== pick.relevance)
         return false;
       if (pick.deity !== "All" && s.deity !== pick.deity) return false;
+      if (pick.status !== "All" && s.status !== pick.status) return false; // NEW
       if (toNum(s.footfall) < minFootfall) return false;
       if (toNum(s.areaSqFt) < minArea) return false;
       return true;
@@ -125,9 +148,11 @@ const DeityStructure = () => {
     setFiltered(result);
   }, [structures, pick, minFootfall, minArea]);
 
+  // map link
   const mapUrl = (lat, lng) =>
     lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null;
 
+  // status badge
   const statusClass = (status) => {
     const v = (status || "").toLowerCase();
     if (v.includes("critical") || v.includes("block"))
@@ -141,6 +166,7 @@ const DeityStructure = () => {
     return "status-badge neutral";
   };
 
+  // update API (status/relevance)
   const handleUpdate = async (id, field, value) => {
     try {
       const { data } = await axios.put(
@@ -159,6 +185,7 @@ const DeityStructure = () => {
     }
   };
 
+  // react-select styles
   const selectStyles = {
     control: (base) => ({
       ...base,
@@ -173,6 +200,7 @@ const DeityStructure = () => {
     menu: (base) => ({ ...base, zIndex: 5 }),
   };
 
+  // slider helpers
   const goToPhoto = (id, idx) => setCurrentIndex((p) => ({ ...p, [id]: idx }));
   const nextPhoto = (id, length) =>
     setCurrentIndex((p) => ({ ...p, [id]: ((p[id] || 0) + 1) % length }));
@@ -182,6 +210,28 @@ const DeityStructure = () => {
     setMinFootfall(0);
     setMinArea(0);
   };
+
+  /* =========================
+     Fullscreen Image Viewer
+     ========================= */
+  const [viewer, setViewer] = useState({
+    open: false,
+    photos: [],
+    index: 0,
+    title: "",
+  });
+
+  const openViewer = (photos, index = 0, title = "") =>
+    setViewer({ open: true, photos, index, title });
+
+  const closeViewer = () => setViewer((v) => ({ ...v, open: false }));
+  const prevViewer = () =>
+    setViewer((v) => ({
+      ...v,
+      index: (v.index - 1 + v.photos.length) % v.photos.length,
+    }));
+  const nextViewerAbs = () =>
+    setViewer((v) => ({ ...v, index: (v.index + 1) % v.photos.length }));
 
   return (
     <div className="page-layout no-right">
@@ -310,6 +360,29 @@ const DeityStructure = () => {
                   styles={selectStyles}
                 />
               </div>
+
+              {/* NEW: Status filter */}
+              <div className="filter-field">
+                <label>Status</label>
+                <Select
+                  value={
+                    pick.status === "All"
+                      ? null
+                      : { value: pick.status, label: pick.status }
+                  }
+                  onChange={(opt) =>
+                    setPick({ ...pick, status: opt ? opt.value : "All" })
+                  }
+                  options={[
+                    { value: "All", label: "All" },
+                    ...statuses.map((k) => ({ value: k, label: k })),
+                  ]}
+                  isSearchable
+                  placeholder="Select Status"
+                  className="custom-select"
+                  styles={selectStyles}
+                />
+              </div>
             </div>
 
             <div className="filter-row sliders">
@@ -424,21 +497,31 @@ const DeityStructure = () => {
                   </div>
 
                   <div className="meta-vertical">
-                    <div>
-                      <strong>Deity Name:</strong> {item.deity || "-"}
-                    </div>
-                    <div>
-                      <strong>Sector:</strong> {item.sector || "-"}
-                    </div>
-                    <div>
-                      <strong>Ward No.:</strong> {item.ward || "-"}
-                    </div>
-                    <div>
-                      <strong>Footfall:</strong> {item.footfall || "-"}
-                    </div>
-                    <div>
-                      <strong>Registration:</strong> {item.registration || "-"}
-                    </div>
+                    {hasValue(item.deity) && (
+                      <div>
+                        <strong>Deity Name:</strong> {item.deity}
+                      </div>
+                    )}
+                    {hasValue(item.sector) && (
+                      <div>
+                        <strong>Sector:</strong> {item.sector}
+                      </div>
+                    )}
+                    {hasValue(item.ward) && (
+                      <div>
+                        <strong>Ward No.:</strong> {item.ward}
+                      </div>
+                    )}
+                    {hasValue(item.footfall) && (
+                      <div>
+                        <strong>Footfall:</strong> {item.footfall}
+                      </div>
+                    )}
+                    {hasValue(item.registration) && (
+                      <div>
+                        <strong>Registration:</strong> {item.registration}
+                      </div>
+                    )}
                   </div>
 
                   {item.remarks && (
@@ -460,6 +543,13 @@ const DeityStructure = () => {
                             src={src}
                             alt={item.structureName || "Structure"}
                             className="structure-image-side"
+                            onClick={() =>
+                              openViewer(
+                                photos.length ? photos : [PLACEHOLDER_IMG],
+                                i,
+                                item.structureName || "Structure"
+                              )
+                            }
                             onError={(e) =>
                               (e.currentTarget.src = PLACEHOLDER_IMG)
                             }
@@ -552,6 +642,63 @@ const DeityStructure = () => {
           })}
         </div>
       </div>
+
+      {/* ===== Lightbox ===== */}
+      {viewer.open && (
+        <div
+          className="lightbox-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeViewer}
+        >
+          <div className="lightbox-sheet" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="lightbox-close"
+              onClick={closeViewer}
+              aria-label="Close"
+              title="Close"
+            >
+              ×
+            </button>
+
+            <div className="lightbox-body">
+              <button
+                className="lightbox-nav left"
+                onClick={prevViewer}
+                aria-label="Previous"
+                title="Previous"
+              >
+                ‹
+              </button>
+
+              <img
+                className="lightbox-img"
+                src={viewer.photos[viewer.index] || PLACEHOLDER_IMG}
+                alt={viewer.title || "Photo"}
+                onError={(e) => (e.currentTarget.src = PLACEHOLDER_IMG)}
+              />
+
+              <button
+                className="lightbox-nav right"
+                onClick={nextViewerAbs}
+                aria-label="Next"
+                title="Next"
+              >
+                ›
+              </button>
+            </div>
+
+            <div className="lightbox-footer">
+              <span className="lightbox-caption">
+                {viewer.title || "Photo"}
+              </span>
+              <span className="lightbox-count">
+                {viewer.index + 1} / {viewer.photos.length}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

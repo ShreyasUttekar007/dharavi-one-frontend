@@ -248,10 +248,9 @@
 
 /* Dots + arrow column */
 .school-slider-nav {
-  height: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 4px 0;
 }
@@ -276,8 +275,8 @@
 }
 .school-nav-dot.active {
   background: var(--nb-purple);
-    transform: scale(1.2);
-    box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.2);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.2);
 }
 .school-nav-arrow {
   width: 24px;

@@ -26,6 +26,8 @@ import { ChatProvider } from "./context/ChatContext";
 import ChatFloat from "./components/ChatFloat";
 import ChatSheet from "./components/ChatSheet";
 import ChatFab from "./components/ChatFab";
+import SchoolsTable from "./components/SchoolsTable";
+import UpdateSchool from "./components/UpdateSchool";
 
 /* Layout for protected pages: shows header + sidebar + chat FAB */
 const ProtectedLayout = () => (
@@ -89,6 +91,14 @@ const App = () => {
           <Route
             path="/schools"
             element={<ProtectedRoute element={<SchoolStructures />} />}
+          />
+          <Route
+            path="/schools-table"
+            element={<ProtectedRoute element={<SchoolsTable />} />}
+          />
+          <Route
+            path="/schools/update/:id"
+            element={<ProtectedRoute element={<UpdateSchool />} />}
           />
         </Route>
       </Routes>
