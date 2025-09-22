@@ -54,7 +54,7 @@ const App = () => {
       <Routes>
         {/* Public routes (no header/sidebar/chat) */}
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<Login />} />
+          <Route path="/alternate-login-drp" element={<Login />} />
           <Route path="/update" element={<UpdateLogin />} />
         </Route>
 
