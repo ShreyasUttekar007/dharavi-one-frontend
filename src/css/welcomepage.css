@@ -28,6 +28,7 @@
       transparent 60%
     ),
     linear-gradient(120deg, #fbfcff, #f6f7ff 45%, #fbf7ff);
+    min-height:calc(100vh - 0px);
 }
 
 /* ===== Hero ===== */
