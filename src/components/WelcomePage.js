@@ -97,6 +97,18 @@ const WelcomePage = () => {
                 <span className="card-arrow">→</span>
               </a>
             )}
+            {role === "mod" && (
+              <a href="/nWuRGm1GvLXyCmQ6TbxqfQ7YasvDlY8z87TxUHrX0HUhX0Pxa9" className="dash-card">
+                <div className="card-icon">
+                  <FontAwesomeIcon icon={faUsersLine} />
+                </div>
+                <div className="card-body">
+                  <h3>Add User</h3>
+                  <p>Add new user, provide roles</p>
+                </div>
+                <span className="card-arrow">→</span>
+              </a>
+            )}
           </div>
         </section>
 

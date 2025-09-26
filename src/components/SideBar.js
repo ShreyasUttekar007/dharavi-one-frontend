@@ -7,6 +7,7 @@ import {
   faHouse,
   faSignOutAlt,
   faFolder,
+  faUsersLine,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../logo_image.png";
 import { useSidebar } from "../context/SidebarContext";
@@ -104,10 +105,16 @@ const SideBar = () => {
             <span>School Data</span>
           </a>
 
-          {(role === "mod" || role === "hr") && (
+          {(role === "mod" ) && (
             <a href="/user-wards" className="nb-item" onClick={close}>
               <FontAwesomeIcon icon={faFolder} />
               <span>Ward Allocation</span>
+            </a>
+          )}
+          {(role === "mod" ) && (
+            <a href="/nWuRGm1GvLXyCmQ6TbxqfQ7YasvDlY8z87TxUHrX0HUhX0Pxa9" className="nb-item" onClick={close}>
+              <FontAwesomeIcon icon={faUsersLine} />
+              <span>Add User</span>
             </a>
           )}
 
