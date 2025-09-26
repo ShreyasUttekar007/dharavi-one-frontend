@@ -37,8 +37,6 @@ const Login = () => {
         localforage.setItem("ID", userObj._id),
         localforage.setItem("role", userObj.roles[0]),
         localforage.setItem("role1", userObj.roles[1] || ""),
-        localforage.setItem("empId", userObj.empId || ""),
-        localforage.setItem("stcCode", userObj.stcCode),
         localforage.setItem("roles", userObj.roles),
         localforage.setItem("location", userObj.location),
       ]);

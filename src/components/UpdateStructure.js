@@ -171,6 +171,16 @@ const UpdateStructure = () => {
         />
         <br />
 
+        <label>Remarks:</label>
+        <textarea
+          name="remarks"
+          value={formData.remarks || ""}
+          onChange={handleChange}
+          rows={4}
+          style={{ width: "100%", resize: "vertical" }}
+        />
+        <br />
+
         <label>Upload Images:</label>
         <input type="file" multiple onChange={handleImageChange} />
         <br />

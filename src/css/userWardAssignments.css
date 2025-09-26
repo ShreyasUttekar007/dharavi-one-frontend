@@ -1,0 +1,81 @@
+:root {
+  --nb-blue: #0072bc;
+  --nb-purple: #8e2de2;
+  --nb-purple-deep: #6b21a8;
+  --nb-card: #fff;
+  --nb-gray-200: #e6e9ef;
+  --nb-gray-300: #d1d5db;
+  --nb-text: #0f172a;
+}
+.uw-wrap {
+  padding: 22px;
+}
+.uw-title {
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--nb-purple-deep);
+  margin: 0 0 12px;
+}
+.uw-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.uw-search {
+  flex: 1 1 260px;
+  max-width: 400px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--nb-gray-300);
+  padding: 0 10px;
+}
+.uw-note {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.uw-table-wrap {
+  background: var(--nb-card);
+  border: 1px solid var(--nb-gray-200);
+  border-radius: 12px;
+  overflow: auto;
+}
+.uw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.uw-table th,
+.uw-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--nb-gray-200);
+  text-align: left;
+}
+.uw-table thead th {
+  background: #fafbff;
+  font-weight: 800;
+}
+.uw-name {
+  font-weight: 700;
+  color: var(--nb-text);
+}
+
+.uw-save {
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg, var(--nb-blue), var(--nb-purple));
+}
+.uw-empty {
+  text-align: center;
+  color: #64748b;
+  padding: 16px;
+}
+.uw-loading {
+  color: #475569;
+}

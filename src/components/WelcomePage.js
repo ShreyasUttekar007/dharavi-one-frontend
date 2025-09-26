@@ -3,9 +3,7 @@ import localforage from "localforage";
 import "../css/welcomepage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolder, faUsersLine } from "@fortawesome/free-solid-svg-icons";
-import StructureSnapshots from "./StructureSnapshots";
 import img from "../Web_Banner.png";
-
 
 const WelcomePage = () => {
   const [userName, setUserName] = useState("");
@@ -13,7 +11,7 @@ const WelcomePage = () => {
 
   useEffect(() => {
     localforage.getItem("userName").then((name) => name && setUserName(name));
-    localforage.getItem("role1").then((r) => r && setRole(r));
+    localforage.getItem("role").then((r) => r && setRole(r));
   }, []);
 
   return (
@@ -33,7 +31,7 @@ const WelcomePage = () => {
           <h2 className="section-title">Dashboards</h2>
 
           <div className="card-grid">
-            {(role === "mod" || role === "hr") && (
+            {/* {(role === "mod" || role === "hr") && (
               <a href="/userdashboard" className="dash-card">
                 <div className="card-icon">
                   <FontAwesomeIcon icon={faUsersLine} />
@@ -44,7 +42,7 @@ const WelcomePage = () => {
                 </div>
                 <span className="card-arrow">→</span>
               </a>
-            )}
+            )} */}
 
             <a href="/deity-structures" className="dash-card">
               <div className="card-icon">
@@ -67,7 +65,6 @@ const WelcomePage = () => {
               <span className="card-arrow">→</span>
             </a>
 
-            
             <a href="/structure-data" className="dash-card">
               <div className="card-icon">
                 <FontAwesomeIcon icon={faFolder} />
@@ -88,6 +85,18 @@ const WelcomePage = () => {
               </div>
               <span className="card-arrow">→</span>
             </a>
+            {role === "mod" && (
+              <a href="/user-wards" className="dash-card">
+                <div className="card-icon">
+                  <FontAwesomeIcon icon={faUsersLine} />
+                </div>
+                <div className="card-body">
+                  <h3>Ward Allocation</h3>
+                  <p>Assign wards and manage user access</p>
+                </div>
+                <span className="card-arrow">→</span>
+              </a>
+            )}
           </div>
         </section>
 

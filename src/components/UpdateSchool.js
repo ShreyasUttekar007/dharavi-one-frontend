@@ -250,9 +250,13 @@ const UpdateSchool = () => {
                 src={url}
                 alt="school"
                 width="100"
-                style={{ marginRight: 10, marginBottom: 10, objectFit: "cover" }}
+                style={{
+                  marginRight: 10,
+                  marginBottom: 10,
+                  objectFit: "cover",
+                }}
               />
-            ))} 
+            ))}
           </div>
         )}
 

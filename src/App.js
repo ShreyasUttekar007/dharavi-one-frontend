@@ -23,11 +23,11 @@ import SchoolStructures from "./components/SchoolStructures";
 
 /* ⬇️ NEW: global chat provider + floating button + modal */
 import { ChatProvider } from "./context/ChatContext";
-import ChatFloat from "./components/ChatFloat";
 import ChatSheet from "./components/ChatSheet";
 import ChatFab from "./components/ChatFab";
 import SchoolsTable from "./components/SchoolsTable";
 import UpdateSchool from "./components/UpdateSchool";
+import UserWardAssignments from "./components/UserWardAssignments";
 
 /* Layout for protected pages: shows header + sidebar + chat FAB */
 const ProtectedLayout = () => (
@@ -99,6 +99,10 @@ const App = () => {
           <Route
             path="/schools/update/:id"
             element={<ProtectedRoute element={<UpdateSchool />} />}
+          />
+          <Route
+            path="/user-wards"
+            element={<ProtectedRoute element={<UserWardAssignments />} />}
           />
         </Route>
       </Routes>

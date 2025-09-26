@@ -6,17 +6,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
   faSignOutAlt,
-  faUserPlus,
-  faUsersLine,
   faFolder,
-  faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../logo_image.png";
 import { useSidebar } from "../context/SidebarContext";
 
 const SideBar = () => {
-  const { sidebarOpen, close, open, toggle } = useSidebar(); // <— same state
-  const [showFormModal, setShowFormModal] = useState(false);
+  const { sidebarOpen, close } = useSidebar(); 
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
@@ -34,7 +30,7 @@ const SideBar = () => {
       localforage.removeItem("location"),
       localforage.removeItem("stcCode"),
     ]);
-    navigate("/");
+    navigate("/alternate-login-drp");
     close();
   };
 
@@ -42,7 +38,7 @@ const SideBar = () => {
     (async () => {
       try {
         const [r1, mail, name] = await Promise.all([
-          localforage.getItem("role1"),
+          localforage.getItem("role"),
           localforage.getItem("email"),
           localforage.getItem("userName"),
         ]);
@@ -82,12 +78,12 @@ const SideBar = () => {
             <span>Home</span>
           </a>
 
-          {(role === "mod" || role === "hr") && (
+          {/* {(role === "mod" || role === "hr") && (
             <a href="/userdashboard" className="nb-item" onClick={close}>
               <FontAwesomeIcon icon={faUsersLine} />
               <span>User Data</span>
             </a>
-          )}
+          )} */}
 
           <a href="/deity-structures" className="nb-item" onClick={close}>
             <FontAwesomeIcon icon={faFolder} />
@@ -109,6 +105,13 @@ const SideBar = () => {
           </a>
 
           {(role === "mod" || role === "hr") && (
+            <a href="/user-wards" className="nb-item" onClick={close}>
+              <FontAwesomeIcon icon={faFolder} />
+              <span>Ward Allocation</span>
+            </a>
+          )}
+
+          {/* {(role === "mod" || role === "hr") && (
             <a
               href="/nWuRGm1GvLXyCmQ6TbxqfQ7YasvDlY8z87TxUHrX0HUhX0Pxa9"
               className="nb-item"
@@ -117,7 +120,7 @@ const SideBar = () => {
               <FontAwesomeIcon icon={faUserPlus} />
               <span>Add User</span>
             </a>
-          )}
+          )} */}
         </nav>
 
         <div className="nb-footer">

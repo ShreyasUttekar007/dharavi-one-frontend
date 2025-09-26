@@ -18,6 +18,14 @@ const DeityStructure = () => {
   const [structures, setStructures] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [currentIndex, setCurrentIndex] = useState({});
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const t = await localforage.getItem("token");
+      setToken(t || "");
+    })();
+  }, []);
 
   // filters
   const initialPick = {
@@ -58,22 +66,48 @@ const DeityStructure = () => {
 
   // data
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
-        const res = await axios.get(`${API_URL}/structures/get-structure`);
+        // 1) read token just-in-time and validate it
+        const tk = (await localforage.getItem("token")) || "";
+        const token =
+          typeof tk === "string" ? tk.trim().replace(/^"|"$/g, "") : "";
+
+        if (!token) {
+          console.warn("No auth token found");
+          return; // or redirect to login
+        }
+
+        // 2) call with header
+        const res = await axios.get(`${API_URL}/structures/get-structure`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (cancelled) return;
+
         const data = res.data || [];
         setStructures(data);
         setFiltered(data);
 
-        // init slide index per card
         const initIdx = {};
         data.forEach((s) => (initIdx[s._id || s.primaryKey] = 0));
         setCurrentIndex(initIdx);
       } catch (e) {
         console.error("Error fetching structures:", e);
+        if (e?.response?.status === 401) {
+          // token invalid/expired: clear and route to login if you want
+          await localforage.removeItem("token");
+          // navigate("/");
+        }
       }
     })();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [API_URL]);
 
   const toNum = (v) => {
     if (v == null) return 0;
